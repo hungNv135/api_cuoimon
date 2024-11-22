@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Xe</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+     <div class="container">
+        <!-- Form nhập thông tin xe -->
+        <div class="form-section">
+            <h2>Xe Vip Pro</h2>
+            <form id="carForm">
+                <div class="form-group">
+                    <label for="_id">Mã Xe:</label>
+                    <input type="text" id="_id" name="_id" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="tenXe">Tên Xe:</label>
+                    <input type="text" id="tenXe" name="tenXe" placeholder="Nhập tên xe">
+                </div>
+                <div class="form-group">
+                    <label for="hangSanXuat">Hãng Sản Xuất:</label>
+                    <input type="text" id="hangSanXuat" name="hangSanXuat" placeholder="Nhập hãng sản xuất">
+                </div>
+                <div class="form-group">
+                    <label for="namSanXuat">Năm Sản Xuất:</label>
+                    <input type="number" id="namSanXuat" name="namSanXuat" placeholder="Nhập năm sản xuất" min="1900" max="2100">
+                </div>
+                <div class="form-group">
+                    <label for="giaBan">Giá Bán:</label>
+                    <input type="number" id="giaBan" name="giaBan" placeholder="Nhập giá bán" min="0">
+                </div>
+                <div class="form-group">
+                    <label for="moTa">Mô Tả:</label>
+                    <textarea id="moTa" name="moTa" rows="3" placeholder="Mô tả xe"></textarea>
+                </div>
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="add(event)">Thêm</button>
+                    <button class="btn btn-secondary" onclick="update(event)">Cập Nhật</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Danh sách xe -->
+        <div class="table-section">
+            <h2>Danh Sách Xe</h2>
+            <div id="loading" class="loading">Đang tải dữ liệu...</div>
+            <table id="carTable">
+                <thead>
+                    <tr>
+                        <th>Tên Xe</th>
+                        <th>Hãng Sản Xuất</th>
+                        <th>Năm Sản Xuất</th>
+                        <th>Giá Bán</th>
+                        <th>Mô Tả</th>
+                        <th>Hành Động</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Dữ liệu sẽ được tải động -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            loadCars();
+        });
+
+        const form = document.getElementById("carForm");
+
+
+        function add(event){
+
+            event.preventDefault(); // Ngăn không cho form gửi yêu cầu GET mặc định
+            
+    
+
+
+            const tenXe = document.getElementById('tenXe').value;
+            const hangSanXuat = document.getElementById('hangSanXuat').value;
+            const namSanXuat = document.getElementById('namSanXuat').value;
+            const giaBan = document.getElementById('giaBan').value;
+            const moTa = document.getElementById('moTa').value;
+
+            // Tạo đối tượng chứa dữ liệu form
+            const data = {
+                tenXe: tenXe,
+                hangSX: hangSanXuat,
+                namSX: parseInt(namSanXuat, 10),
+                giaBan: parseFloat(giaBan),
+                moTa: moTa
+            };
+
+
+
+            // Gửi dữ liệu lên API bằng Fetch API
+            fetch("/api/addCar", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                console.log("Dữ liệu đã được gửi:", data);
+                alert("Dữ liệu đã được gửi thành công!");
+                form.reset();
+                loadCars(); // Reload car data after submission
+            })
+            .catch((error) => {
+                console.error("Có lỗi xảy ra:", error);
+                alert("Đã xảy ra lỗi, vui lòng thử lại.");
+            });
+        }
+ 
+
+        function loadCars() {
+            const tableBody = document.getElementById("tableBody");
+            const loading = document.getElementById("loading");
+
+            fetch("/api/getAllCars", {
+                method: "GET",
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                const cars = data.data;
+
+                console.log(data);
+
+                tableBody.innerHTML = ""; // Clear old data
+                loading.style.display = "none"; // Hide loading indicator
+
+                if (cars.length > 0) {
+                    cars.forEach((car) => {
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                            <td>${car.tenXe}</td>
+                            <td>${car.hangSX}</td>
+                            <td>${car.namSX}</td>
+                            <td>${car.giaBan}</td>
+                            <td>${car.moTa}</td>
+                            <td id="last">
+                            <img onclick="openDialog('${car._id}','${car.tenXe}','${car.hangSX}','${car.namSX}','${car.giaBan}','${car.moTa}')"width="20" height="20" src="https://img.icons8.com/ios-glyphs/30/edit--v1.png" alt="edit--v1"/>
+                                <img onclick="deleteCar('${car._id}')" width="20" height="20" src="https://img.icons8.com/material-rounded/50/filled-trash.png" alt="filled-trash"/>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                } else {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `<td colspan="6" style="text-align:center;">Không có dữ liệu</td>`;
+                    tableBody.appendChild(row);
+                }
+            })
+            .catch((error) => {
+                console.error("Lỗi khi tải danh sách xe:", error);
+                loading.style.display = "none";
+                const row = document.createElement("tr");
+                row.innerHTML = `<td colspan="6" style="text-align:center;color:red;">Lỗi tải dữ liệu</td>`;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function deleteCar(maXe) {
+            if (confirm("Bạn có chắc chắn muốn xóa xe này không?")) {
+                fetch(`/api/deleteCar/${maXe}`, {
+                    method: "DELETE",
+                })
+                .then((response) => response.json())
+                .then((data) => {
+                    console.log("Xe đã được xóa:", data);
+                    alert("Xe đã được xóa thành công!");
+                    loadCars(); // Reload car data after deletion
+                })
+                .catch((error) => {
+                    console.error("Có lỗi xảy ra khi xóa xe:", error);
+                    alert("Đã xảy ra lỗi khi xóa xe, vui lòng thử lại.");
+                });
+            }
+        }
+
+
+
+        
+        function openDialog(id,tenXe,hangSanXuat,namSanXuat,giaBan,moTa){
+            document.getElementById('_id').value = id;
+            document.getElementById('tenXe').value = tenXe;
+            document.getElementById('hangSanXuat').value = hangSanXuat;
+            document.getElementById('namSanXuat').value = namSanXuat;
+            document.getElementById('giaBan').value = giaBan;
+            document.getElementById('moTa').value = moTa;
+        }
+
+        function update(event) {
+
+            event.preventDefault(); // Ngăn không cho form gửi yêu cầu GET mặc định
+            const id = document.getElementById('_id').value;
+            const tenXe = document.getElementById('tenXe').value;
+            const hangSanXuat = document.getElementById('hangSanXuat').value;
+            const namSanXuat = document.getElementById('namSanXuat').value;
+            const giaBan = document.getElementById('giaBan').value;
+            const moTa = document.getElementById('moTa').value;
+
+            // Tạo đối tượng chứa dữ liệu form
+            const data = {
+                tenXe: tenXe,
+                hangSX: hangSanXuat,
+                namSX: parseInt(namSanXuat, 10),
+                giaBan: parseFloat(giaBan),
+                moTa: moTa
+            };
+
+            // Thực hiện fetch với phương thức PUT và đường dẫn chứa id
+            fetch(`/api/updateCar/${id}`, {
+                method: "PUT", // Hoặc "PATCH" tùy theo API của bạn
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                console.log("Dữ liệu đã được gửi:", data);
+                alert("Dữ liệu đã được cập nhật thành công!");
+                document.querySelector('form').reset(); // Reset form
+                loadCars(); // Reload dữ liệu sau khi cập nhật
+            })
+            .catch((error) => {
+                console.error("Có lỗi xảy ra:", error);
+                alert("Đã xảy ra lỗi, vui lòng thử lại.");
+            });
+        }
+
+       
+        
+    </script>
+</body>
+</html>

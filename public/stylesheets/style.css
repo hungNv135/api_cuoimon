@@ -1,0 +1,131 @@
+/* Reset mặc định */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Đặt font chữ toàn bộ */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
+  color: #333;
+  padding: 20px;
+}
+
+/* Container chính */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+/* Phần form nhập xe */
+.form-section,
+.table-section {
+  width: 45%; /* Đảm bảo form và bảng có cùng kích thước */
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.form-section h2,
+.table-section h2 {
+  margin-bottom: 20px;
+  color: #444;
+  text-align: center;
+  font-size: 20px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  font-size: 14px;
+  color: #555;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+textarea {
+  resize: none;
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
+}
+
+.btn {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background-color: #6e6c6c;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #615e5e;
+}
+
+.btn-secondary {
+  background-color: #ff5722;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #e64a19;
+}
+
+/* Phần bảng danh sách */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  background-color: #6e6c6c;
+  color: white;
+}
+
+th, td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  font-size: 14px;
+}
+
+
+.loading {
+  text-align: center;
+  font-size: 16px;
+  color: #ff5722;
+  margin: 10px 0;
+}
+
+/* Icon hành động */
+td img {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  margin: 0 5px;
+}
